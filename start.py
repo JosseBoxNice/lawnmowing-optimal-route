@@ -35,25 +35,25 @@ def find_lawnmower(grid: list[list[str]]) -> tuple[int, int]:
     return x, y
 
 
-def next_pos(position: tuple[int, int], dir: str) -> tuple[bool, tuple[int, int], str]:
+def next_pos(position: tuple[int, int], dir: str) -> tuple[int, int]:
 
-    nextPos: tuple[int, int] = position
-
-    # if 0 <= y <= len(grid) and 0 <= x < len(grid[0]) and grid[y][x] == "#":
-    #    return isCrossroads, nextPos, dir
-    print(pathOptions)
-    print(dir)
-    print(nextPos)
-    return isCrossroads, nextPos, dir
-
-
-def scan_around(dir: str) -> tuple[bool, list[str]]:
     directions: dict[str, tuple[int, int]] = {
         "up": (0, -1),
         "down": (0, 1),
         "left": (-1, 0),
         "right": (1, 0),
     }
+    dx, dy = directions[dir]
+    x, y = position
+    nextPos = (x + dx, y + dy)
+    x, y = nextPos
+
+    # if 0 <= y <= len(grid) and 0 <= x < len(grid[0]) and grid[y][x] == "#":
+    #    return isCrossroads, nextPos, dir
+    return nextPos
+
+
+def scan_around(dir: str, position: tuple[int, int]) -> tuple[bool, list[str]]:
 
     turn_left: dict[str, str] = {
         "up": "left",
@@ -79,12 +79,9 @@ def scan_around(dir: str) -> tuple[bool, list[str]]:
     pathOptions: list[str] = []
     i = 0
     while i <= 3:
-        dx, dy = directions[dir]
-        x, y = position
-        nextPos = (x + dx, y + dy)
-        x, y = nextPos
+        x, y = next_pos(position, dir)
         # save different options ec. ["#"] to access later.
-        if 0 <= y <= len(grid) and 0 <= x < len(grid[0]):
+        if 0 <= y < len(grid) and 0 <= x < len(grid[0]):
             if grid[y][x] == "#":
                 pathOptions.append(dir)
 
@@ -111,12 +108,14 @@ position: tuple[int, int] = find_lawnmower(grid)
 while any("#" in row for row in grid):
     grid[position[1]][position[0]] = "="
 
-    isCrossroad, pathOptions = scan_around(dir)
+    isCrossroad, pathOptions = scan_around(dir, position)
+
+    # position = next_pos(position, dir)
+
+    if isCrossroad:
+        crossroards: crossroads = crossroads(position)
     print(pathOptions, isCrossroad)
-    isCrossroads, position, dir = next_pos(position, dir)
 
     for line in grid:
         print(line)
     print("------------------------------------------------------")
-
-    crossroards: crossroads = crossroads(position)
