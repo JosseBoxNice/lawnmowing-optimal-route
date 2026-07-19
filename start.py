@@ -35,10 +35,19 @@ def find_lawnmower(grid: list[list[str]]) -> tuple[int, int]:
     return x, y
 
 
-def next_pos(
-    position: tuple[int, int], grid: list[list[str]], dir: str
-) -> tuple[bool, tuple[int, int], str]:
+def next_pos(position: tuple[int, int], dir: str) -> tuple[bool, tuple[int, int], str]:
 
+    nextPos: tuple[int, int] = position
+
+    # if 0 <= y <= len(grid) and 0 <= x < len(grid[0]) and grid[y][x] == "#":
+    #    return isCrossroads, nextPos, dir
+    print(pathOptions)
+    print(dir)
+    print(nextPos)
+    return isCrossroads, nextPos, dir
+
+
+def scan_around(dir: str) -> tuple[bool, list[str]]:
     directions: dict[str, tuple[int, int]] = {
         "up": (0, -1),
         "down": (0, 1),
@@ -67,8 +76,6 @@ def next_pos(
         "left": "up",
     }
 
-    nextPos: tuple[int, int] = position
-
     pathOptions: list[str] = []
     i = 0
     while i <= 3:
@@ -76,23 +83,25 @@ def next_pos(
         x, y = position
         nextPos = (x + dx, y + dy)
         x, y = nextPos
-        # save different options ec. ["=", "#", "x", " "] to access later.
-        pathOptions.append(grid[y][x])
+        # save different options ec. ["#"] to access later.
+        if 0 <= y <= len(grid) and 0 <= x < len(grid[0]):
+            if grid[y][x] == "#":
+                pathOptions.append(dir)
 
-        if 0 <= y <= len(grid) and 0 <= x < len(grid[0]) and grid[y][x] == "#":
-            return isCrossroads, nextPos, dir
-        elif i == 0:
+        if i == 0:
             dir = turn_left[dir]
-
         elif i == 1:
             dir = turn_around[dir]
         elif i == 2:
             dir = turn_right[dir]
         i += 1
 
-    print(dir)
-    print(nextPos)
-    return isCrossroads, nextPos, dir
+    # check if isCrossroads
+    isCrossroad: bool = False
+    if len(pathOptions) > 1:
+        isCrossroad = True
+
+    return isCrossroad, pathOptions
 
 
 dir = "up"
@@ -102,7 +111,9 @@ position: tuple[int, int] = find_lawnmower(grid)
 while any("#" in row for row in grid):
     grid[position[1]][position[0]] = "="
 
-    isCrossroads, position, dir = next_pos(position, grid, dir)
+    isCrossroad, pathOptions = scan_around(dir)
+    print(pathOptions, isCrossroad)
+    isCrossroads, position, dir = next_pos(position, dir)
 
     for line in grid:
         print(line)
