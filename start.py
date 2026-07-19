@@ -1,4 +1,4 @@
-from crossroads import crossroads
+import time
 
 with open(file="map/demo.txt") as f:
     maptxt: list[str] = f.read().splitlines()
@@ -46,10 +46,7 @@ def next_pos(position: tuple[int, int], dir: str) -> tuple[int, int]:
     dx, dy = directions[dir]
     x, y = position
     nextPos = (x + dx, y + dy)
-    x, y = nextPos
 
-    # if 0 <= y <= len(grid) and 0 <= x < len(grid[0]) and grid[y][x] == "#":
-    #    return isCrossroads, nextPos, dir
     return nextPos
 
 
@@ -104,18 +101,27 @@ def scan_around(dir: str, position: tuple[int, int]) -> tuple[bool, list[str]]:
 dir = "up"
 grid: list[list[str]] = create_grid(map=maptxt)
 position: tuple[int, int] = find_lawnmower(grid)
+crossroads: list[tuple[int, int]] = []
 
 while any("#" in row for row in grid):
+    position = next_pos(position, dir)
+
     grid[position[1]][position[0]] = "="
 
     isCrossroad, pathOptions = scan_around(dir, position)
 
-    # position = next_pos(position, dir)
-
     if isCrossroad:
-        crossroards: crossroads = crossroads(position)
+        crossroads.append(position)
+
     print(pathOptions, isCrossroad)
+
+    if len(pathOptions) == 0:
+        position = crossroads.pop()
+
+    else:
+        dir: str = pathOptions[0]
 
     for line in grid:
         print(line)
     print("------------------------------------------------------")
+    time.sleep(1)
