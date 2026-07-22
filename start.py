@@ -50,7 +50,7 @@ def next_pos(position: tuple[int, int], dir: str) -> tuple[int, int]:
     return nextPos
 
 
-def scan_around(dir: str, position: tuple[int, int]) -> tuple[bool, dict[str, str]]:
+def scan_around(dir: str, position: tuple[int, int]) -> dict[str, list[str]]:
 
     turn_left: dict[str, str] = {
         "up": "left",
@@ -73,7 +73,10 @@ def scan_around(dir: str, position: tuple[int, int]) -> tuple[bool, dict[str, st
         "left": "up",
     }
 
-    pathOptions: dict[str, str] = {}
+    pathOptions: dict[str, list[str]] = {
+        "#": [],
+        "=": [],
+    }
     i = 0
     while i <= 3:
         x, y = next_pos(position, dir)
@@ -81,7 +84,7 @@ def scan_around(dir: str, position: tuple[int, int]) -> tuple[bool, dict[str, st
         if 0 <= y < len(grid) and 0 <= x < len(grid[0]):
             symbol: str = grid[y][x]
             if symbol in ("#", "="):
-                pathOptions[symbol] = dir
+                pathOptions[symbol].append(dir)
 
         if i == 0:
             dir = turn_left[dir]
@@ -91,33 +94,28 @@ def scan_around(dir: str, position: tuple[int, int]) -> tuple[bool, dict[str, st
             dir = turn_right[dir]
         i += 1
 
-    # check if isCrossroads
-    isCrossroad: bool = False
-    if pathOptions > 1:
-        #############HEHREHEHREHREHRHER
-        # pathOPtions is a dictionary wich means that it can have only one key "#" so I think i need to create a class
-        #
-
-        isCrossroad = True
-
-    return isCrossroad, pathOptions
+    return pathOptions
 
 
 def pathToCrossroad(
-    position: tuple[int, int], destination: tuple[int, int], pathOptions: dict[str, str]
+    position: tuple[int, int],
+    destination: tuple[int, int],
+    pathOptions: dict[str, list[str]],
 ) -> tuple[int, int]:
 
     # Get positions of possible directions
     optionPositions: list[tuple[int, int]] = []
-    for option in pathOptions:
-        optionPositions.append(next_pos(position, option[0]))
+    for option in pathOptions["="]:
+        optionPositions.append(next_pos(position, option))
+
+    print(optionPositions)
 
     # Get distances to destiantion of possible directions
     distances: list[float] = []
-    dy, dx = destination
+    dx, dy = destination
     for pos in optionPositions:
-        y, x = pos
-        distances.append(abs(x + dx * y + dy) / 2)
+        x, y = pos
+        distances.append(abs((x - dx) + (y - dy)))
 
     # find shortest dist and get index
     closest: float = float("inf")
@@ -135,28 +133,29 @@ position: tuple[int, int] = find_lawnmower(grid)
 crossroads: list[tuple[int, int]] = []
 
 while any("#" in row for row in grid):
-    position = next_pos(position, dir)
+    pathOptions = scan_around(dir, position)
 
-    grid[position[1]][position[0]] = "="
-
-    isCrossroad, pathOptions = scan_around(dir, position)
-
-    if isCrossroad:
+    # check if isCrossroads
+    isCrossroad: bool = False
+    if len(pathOptions["#"]) > 1:
+        isCrossroad = True
         crossroads.append(position)
 
     print(pathOptions, isCrossroad)
 
-    if "#" not in pathOptions:
+    if len(pathOptions["#"]) == 0:
         while position != crossroads[len(crossroads) - 1]:
             position = pathToCrossroad(
                 position, crossroads[len(crossroads) - 1], pathOptions
             )
-            # position = crossroads.pop()
+            pathOptions: dict[str, list[str]] = scan_around(dir, position)
+        _ = crossroads.pop()
 
-    else:
-        dir: str = pathOptions["#"]
-        print(dir)
+    dir: str = pathOptions["#"][0]
+    print(dir)
 
+    position = next_pos(position, dir)
+    grid[position[1]][position[0]] = "="
     for line in grid:
         print(line)
     print("------------------------------------------------------")
