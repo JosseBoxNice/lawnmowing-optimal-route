@@ -4,14 +4,6 @@ from crossroads import Crossroad
 with open(file="map/demo.txt") as f:
     maptxt: list[str] = f.read().splitlines()
 
-#   01234
-# 0 #####
-# 1 ###x#
-# 2 ##xxx
-# 3 ###x#
-# 4 #####
-# 5 L####
-
 
 def create_grid(map: list[str]) -> list[list[str]]:
     grid: list[list[str]] = []
@@ -51,7 +43,9 @@ def next_pos(position: tuple[int, int], dir: str) -> tuple[int, int]:
     return nextPos
 
 
-def scan_around(dir: str, position: tuple[int, int]) -> dict[str, list[str]]:
+def scan_around(
+    dir: str, position: tuple[int, int], grid: list[list[str]]
+) -> dict[str, list[str]]:
 
     turn_left: dict[str, str] = {
         "up": "left",
@@ -128,7 +122,7 @@ def pathToCrossroad(
     return optionPositions[index][0], optionPositions[index][1]
 
 
-def printOutput(timeSpent: int) -> int:
+def printOutput(timeSpent: int, grid: list[list[str]]) -> int:
     timeSpent += 1
     print(timeSpent)
     for line in grid:
@@ -155,44 +149,44 @@ def isTurn(dir: str, newDir: str) -> bool:
     return True
 
 
-# Start variable definitions
-dir = "up"
-grid: list[list[str]] = create_grid(map=maptxt)
-position: tuple[int, int] = find_lawnmower(grid)
-tempCrossroads: list[tuple[int, int]] = []
-permCrossroads: list[Crossroad] = []
-timeSpent = 0
+def execute_path() -> int:
+    # Start variable definitions
+    dir = "up"
+    grid: list[list[str]] = create_grid(map=maptxt)
+    position: tuple[int, int] = find_lawnmower(grid)
+    tempCrossroads: list[tuple[int, int]] = []
+    permCrossroads: list[Crossroad] = []
+    timeSpent = 0
 
-while any("#" in row for row in grid):
-    pathOptions = scan_around(dir, position)
+    while any("#" in row for row in grid):
+        pathOptions = scan_around(dir, position, grid)
 
-    # check if isCrossroads
-    isCrossroad: bool = False
-    if len(pathOptions["#"]) > 1:
-        isCrossroad = True
-        tempCrossroads.append(position)
-        permCrossroads.append(Crossroad(position, pathOptions, timeSpent))
+        # check if isCrossroads
+        if len(pathOptions["#"]) > 1:
+            tempCrossroads.append(position)
+            permCrossroads.append(Crossroad(position, pathOptions, timeSpent))
 
-    # print(pathOptions, isCrossroad)
+        # print(pathOptions, isCrossroad)
 
-    if len(pathOptions["#"]) == 0:
-        while position != tempCrossroads[len(tempCrossroads) - 1]:
-            position, newDir = pathToCrossroad(
-                position, tempCrossroads[len(tempCrossroads) - 1], pathOptions
-            )
-            if isTurn(dir, newDir):
-                timeSpent += 1
-            dir = newDir
-            pathOptions = scan_around(dir, position)
-            timeSpent = printOutput(timeSpent)
-        _ = tempCrossroads.pop()
+        if len(pathOptions["#"]) == 0:
+            while position != tempCrossroads[len(tempCrossroads) - 1]:
+                position, newDir = pathToCrossroad(
+                    position, tempCrossroads[len(tempCrossroads) - 1], pathOptions
+                )
+                if isTurn(dir, newDir):
+                    timeSpent += 1
+                dir = newDir
+                pathOptions = scan_around(dir, position, grid)
+                timeSpent = printOutput(timeSpent, grid)
+            _ = tempCrossroads.pop()
 
-    newDir: str = pathOptions["#"][0]
-    if isTurn(dir, newDir):
-        timeSpent += 1
-    dir = newDir
-    # print(dir)
+        newDir: str = pathOptions["#"][0]
+        if isTurn(dir, newDir):
+            timeSpent += 1
+        dir = newDir
+        # print(dir)
 
-    position = next_pos(position, dir)
-    grid[position[1]][position[0]] = "="
-    timeSpent = printOutput(timeSpent)
+        position = next_pos(position, dir)
+        grid[position[1]][position[0]] = "="
+        timeSpent = printOutput(timeSpent, grid)
+    return timeSpent
