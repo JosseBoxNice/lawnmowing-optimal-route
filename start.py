@@ -127,12 +127,14 @@ def pathToCrossroad(
     return optionPositions[index][0], optionPositions[index][1]
 
 
-def printOutput(timeSpent: int) -> None:
+def printOutput(timeSpent: int) -> int:
+    timeSpent += 1
     print(timeSpent)
     for line in grid:
         print(line)
     print("------------------------------------------------------")
-    time.sleep(1)
+    time.sleep(0.5)
+    return timeSpent
 
 
 def isTurn(dir: str, newDir: str) -> bool:
@@ -152,6 +154,7 @@ def isTurn(dir: str, newDir: str) -> bool:
     return True
 
 
+# Start variable definitions
 dir = "up"
 grid: list[list[str]] = create_grid(map=maptxt)
 position: tuple[int, int] = find_lawnmower(grid)
@@ -178,7 +181,7 @@ while any("#" in row for row in grid):
                 timeSpent += 1
             dir = newDir
             pathOptions = scan_around(dir, position)
-            printOutput(timeSpent)
+            timeSpent = printOutput(timeSpent)
         _ = crossroads.pop()
 
     newDir: str = pathOptions["#"][0]
@@ -189,4 +192,4 @@ while any("#" in row for row in grid):
 
     position = next_pos(position, dir)
     grid[position[1]][position[0]] = "="
-    printOutput(timeSpent)
+    timeSpent = printOutput(timeSpent)
