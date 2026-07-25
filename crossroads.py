@@ -9,7 +9,7 @@ class Crossroad:
         self.position: tuple[int, int] = position
         self.pathOptions: dict[str, list[str]] = pathOptions
         self.timeSpent: int = timeSpent
-        self.grid: list[list[str]] = grid
+        self.grid: list[list[str]] = [row.copy() for row in grid]
 
     def __iter__(self):
         yield self.position

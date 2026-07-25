@@ -22,6 +22,7 @@ class PathFinder:
             # check if isCrossroads
             if len(self.pathOptions["#"]) > 1:
                 self.tempCrossroads.append(self.position)
+                print(self.grid)
                 self.permCrossroads.append(
                     Crossroad(
                         self.position, self.pathOptions, self.timeSpent, self.grid
@@ -136,7 +137,6 @@ def pathToCrossroad(
     self: PathFinder, destination: tuple[int, int]
 ) -> tuple[tuple[int, int], str]:
 
-    print(self.pathOptions)
     # Get positions of possible directions
     optionPositions: list[tuple[tuple[int, int], str]] = []
     for option in self.pathOptions["="]:
