@@ -1,20 +1,6 @@
 import time
 from crossroads import Crossroad
 
-with open(file="map/demo.txt") as f:
-    maptxt: list[str] = f.read().splitlines()
-
-
-def create_grid(map: list[str]) -> list[list[str]]:
-    grid: list[list[str]] = []
-
-    for line in map:
-        row: list[str] = []
-        for char in line:
-            row.append(char)
-        grid.append(row)
-    return grid
-
 
 def find_lawnmower(grid: list[list[str]]) -> tuple[int, int]:
     x: int = 0
@@ -149,10 +135,22 @@ def isTurn(dir: str, newDir: str) -> bool:
     return True
 
 
-def execute_path() -> int:
+def no_fresh_grass(position, tempCrossroads, pathOptions, timeSpent, grid, dir):
+    while position != tempCrossroads[len(tempCrossroads) - 1]:
+        position, newDir = pathToCrossroad(
+            position, tempCrossroads[len(tempCrossroads) - 1], pathOptions
+        )
+        if isTurn(dir, newDir):
+            timeSpent += 1
+        dir = newDir
+        pathOptions = scan_around(dir, position, grid)
+        timeSpent = printOutput(timeSpent, grid)
+    _ = tempCrossroads.pop()
+
+
+def execute_path(grid: list[list[str]]) -> tuple[int, list[Crossroad]]:
     # Start variable definitions
     dir = "up"
-    grid: list[list[str]] = create_grid(map=maptxt)
     position: tuple[int, int] = find_lawnmower(grid)
     tempCrossroads: list[tuple[int, int]] = []
     permCrossroads: list[Crossroad] = []
@@ -164,21 +162,12 @@ def execute_path() -> int:
         # check if isCrossroads
         if len(pathOptions["#"]) > 1:
             tempCrossroads.append(position)
-            permCrossroads.append(Crossroad(position, pathOptions, timeSpent))
+            permCrossroads.append(Crossroad(position, pathOptions, timeSpent, grid))
 
         # print(pathOptions, isCrossroad)
 
         if len(pathOptions["#"]) == 0:
-            while position != tempCrossroads[len(tempCrossroads) - 1]:
-                position, newDir = pathToCrossroad(
-                    position, tempCrossroads[len(tempCrossroads) - 1], pathOptions
-                )
-                if isTurn(dir, newDir):
-                    timeSpent += 1
-                dir = newDir
-                pathOptions = scan_around(dir, position, grid)
-                timeSpent = printOutput(timeSpent, grid)
-            _ = tempCrossroads.pop()
+            no_fresh_grass()
 
         newDir: str = pathOptions["#"][0]
         if isTurn(dir, newDir):
@@ -189,4 +178,4 @@ def execute_path() -> int:
         position = next_pos(position, dir)
         grid[position[1]][position[0]] = "="
         timeSpent = printOutput(timeSpent, grid)
-    return timeSpent
+    return timeSpent, permCrossroads

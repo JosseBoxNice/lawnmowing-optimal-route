@@ -1,7 +1,33 @@
 from path_finding import execute_path
 
+with open(file="map/demo.txt") as f:
+    maptxt: list[str] = f.read().splitlines()
+
+
+def create_grid(map: list[str]) -> list[list[str]]:
+    grid: list[list[str]] = []
+
+    for line in map:
+        row: list[str] = []
+        for char in line:
+            row.append(char)
+        grid.append(row)
+    return grid
+
+
+grid = create_grid(maptxt)
+
 times: list[int] = []
 
-timeSpent: int = execute_path()
+timeSpent, permCrossroads = execute_path(grid)
+
+while len(permCrossroads) > 0:
+    while any("#" in row for row in grid):
+        crossroad = permCrossroads[-1]
+
+        position = crossroad.position
+        pathOptions = crossroad.pathOptions
+        timeSpent = crossroad.timeSpent
+        grid = crossroad.grid
 
 times.append(timeSpent)
