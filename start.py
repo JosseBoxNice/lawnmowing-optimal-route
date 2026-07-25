@@ -101,12 +101,12 @@ def pathToCrossroad(
     position: tuple[int, int],
     destination: tuple[int, int],
     pathOptions: dict[str, list[str]],
-) -> tuple[int, int]:
+) -> tuple[tuple[int, int], str]:
 
     # Get positions of possible directions
-    optionPositions: list[tuple[int, int]] = []
+    optionPositions: list[tuple[tuple[int, int], str]] = []
     for option in pathOptions["="]:
-        optionPositions.append(next_pos(position, option))
+        optionPositions.append((next_pos(position, option), option))
 
     # print(optionPositions)
 
@@ -114,7 +114,7 @@ def pathToCrossroad(
     distances: list[float] = []
     dx, dy = destination
     for pos in optionPositions:
-        x, y = pos
+        x, y = pos[0]
         distances.append(abs((x - dx) + (y - dy)))
 
     # find shortest dist and get index
@@ -124,20 +124,39 @@ def pathToCrossroad(
             closest = dist
     index: int = distances.index(closest)
 
-    return optionPositions[index]
+    return optionPositions[index][0], optionPositions[index][1]
 
 
-def printOutput() -> None:
+def printOutput(timeSpent: int) -> None:
+    print(timeSpent)
     for line in grid:
         print(line)
     print("------------------------------------------------------")
-    time.sleep(0.5)
+    time.sleep(1)
+
+
+def isTurn(dir: str, newDir: str) -> bool:
+    if dir == newDir:
+        return False
+
+    turn_around: dict[str, str] = {
+        "up": "down",
+        "down": "up",
+        "right": "left",
+        "left": "right",
+    }
+
+    if turn_around[dir] == newDir:
+        return False
+
+    return True
 
 
 dir = "up"
 grid: list[list[str]] = create_grid(map=maptxt)
 position: tuple[int, int] = find_lawnmower(grid)
 crossroads: list[tuple[int, int]] = []
+timeSpent = 0
 
 while any("#" in row for row in grid):
     pathOptions = scan_around(dir, position)
@@ -152,16 +171,22 @@ while any("#" in row for row in grid):
 
     if len(pathOptions["#"]) == 0:
         while position != crossroads[len(crossroads) - 1]:
-            position = pathToCrossroad(
+            position, newDir = pathToCrossroad(
                 position, crossroads[len(crossroads) - 1], pathOptions
             )
-            pathOptions: dict[str, list[str]] = scan_around(dir, position)
-            printOutput()
+            if isTurn(dir, newDir):
+                timeSpent += 1
+            dir = newDir
+            pathOptions = scan_around(dir, position)
+            printOutput(timeSpent)
         _ = crossroads.pop()
 
-    dir: str = pathOptions["#"][0]
+    newDir: str = pathOptions["#"][0]
+    if isTurn(dir, newDir):
+        timeSpent += 1
+    dir = newDir
     # print(dir)
 
     position = next_pos(position, dir)
     grid[position[1]][position[0]] = "="
-    printOutput()
+    printOutput(timeSpent)
