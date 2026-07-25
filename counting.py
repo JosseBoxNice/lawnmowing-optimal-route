@@ -1,4 +1,4 @@
-from path_finding import execute_path
+from path_finding import PathFinder
 
 with open(file="map/demo.txt") as f:
     maptxt: list[str] = f.read().splitlines()
@@ -17,9 +17,11 @@ def create_grid(map: list[str]) -> list[list[str]]:
 
 grid = create_grid(maptxt)
 
+finder = PathFinder(grid)
+
 times: list[int] = []
 
-timeSpent, permCrossroads = execute_path(grid)
+timeSpent, permCrossroads = finder.execute_path()
 
 while len(permCrossroads) > 0:
     while any("#" in row for row in grid):
