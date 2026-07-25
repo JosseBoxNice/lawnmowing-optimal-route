@@ -1,4 +1,5 @@
 import time
+from crossroads import Crossroad
 
 with open(file="map/demo.txt") as f:
     maptxt: list[str] = f.read().splitlines()
@@ -158,7 +159,8 @@ def isTurn(dir: str, newDir: str) -> bool:
 dir = "up"
 grid: list[list[str]] = create_grid(map=maptxt)
 position: tuple[int, int] = find_lawnmower(grid)
-crossroads: list[tuple[int, int]] = []
+tempCrossroads: list[tuple[int, int]] = []
+permCrossroads: list[Crossroad] = []
 timeSpent = 0
 
 while any("#" in row for row in grid):
@@ -168,21 +170,22 @@ while any("#" in row for row in grid):
     isCrossroad: bool = False
     if len(pathOptions["#"]) > 1:
         isCrossroad = True
-        crossroads.append(position)
+        tempCrossroads.append(position)
+        permCrossroads.append(Crossroad(position, pathOptions, timeSpent))
 
     # print(pathOptions, isCrossroad)
 
     if len(pathOptions["#"]) == 0:
-        while position != crossroads[len(crossroads) - 1]:
+        while position != tempCrossroads[len(tempCrossroads) - 1]:
             position, newDir = pathToCrossroad(
-                position, crossroads[len(crossroads) - 1], pathOptions
+                position, tempCrossroads[len(tempCrossroads) - 1], pathOptions
             )
             if isTurn(dir, newDir):
                 timeSpent += 1
             dir = newDir
             pathOptions = scan_around(dir, position)
             timeSpent = printOutput(timeSpent)
-        _ = crossroads.pop()
+        _ = tempCrossroads.pop()
 
     newDir: str = pathOptions["#"][0]
     if isTurn(dir, newDir):
