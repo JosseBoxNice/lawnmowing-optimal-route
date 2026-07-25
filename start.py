@@ -108,7 +108,7 @@ def pathToCrossroad(
     for option in pathOptions["="]:
         optionPositions.append(next_pos(position, option))
 
-    print(optionPositions)
+    # print(optionPositions)
 
     # Get distances to destiantion of possible directions
     distances: list[float] = []
@@ -127,6 +127,13 @@ def pathToCrossroad(
     return optionPositions[index]
 
 
+def printOutput() -> None:
+    for line in grid:
+        print(line)
+    print("------------------------------------------------------")
+    time.sleep(0.5)
+
+
 dir = "up"
 grid: list[list[str]] = create_grid(map=maptxt)
 position: tuple[int, int] = find_lawnmower(grid)
@@ -141,7 +148,7 @@ while any("#" in row for row in grid):
         isCrossroad = True
         crossroads.append(position)
 
-    print(pathOptions, isCrossroad)
+    # print(pathOptions, isCrossroad)
 
     if len(pathOptions["#"]) == 0:
         while position != crossroads[len(crossroads) - 1]:
@@ -149,14 +156,12 @@ while any("#" in row for row in grid):
                 position, crossroads[len(crossroads) - 1], pathOptions
             )
             pathOptions: dict[str, list[str]] = scan_around(dir, position)
+            printOutput()
         _ = crossroads.pop()
 
     dir: str = pathOptions["#"][0]
-    print(dir)
+    # print(dir)
 
     position = next_pos(position, dir)
     grid[position[1]][position[0]] = "="
-    for line in grid:
-        print(line)
-    print("------------------------------------------------------")
-    time.sleep(0.5)
+    printOutput()
