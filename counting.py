@@ -1,7 +1,9 @@
 from path_finding import PathFinder
-from path_finding import no_fresh_grass
+
+# from path_finding import no_fresh_grass
 from path_finding import isTurn
-from path_finding import next_pos
+
+# from path_finding import next_pos
 from path_finding import printOutput
 
 with open(file="map/demo.txt") as f:
@@ -26,29 +28,33 @@ finder = PathFinder(grid)
 times: list[int] = []
 
 timeSpent, permCrossroads = finder.execute_path()
-grid = permCrossroads[-1].grid
 print(grid)
 print(permCrossroads[-1].position)
 
+# Backtrack through until all paths
 while len(permCrossroads) > 0:
+    crossroad = permCrossroads[-1]
+    pathOptions = crossroad.pathOptions
+    position = crossroad.position
+    timeSpent = crossroad.timeSpent
+    grid = permCrossroads[-1].grid
+
+    if len(pathOptions["#"]) == 0:
+        permCrossroads.pop
+
+    # Run until no more "#"
     while any("#" in row for row in grid):
-        crossroad = permCrossroads[-1]
+        # grid = crossroad.grid
 
-        position = crossroad.position
-        pathOptions = crossroad.pathOptions
-        timeSpent = crossroad.timeSpent
-        grid = crossroad.grid
-
-        if len(finder.pathOptions["#"]) == 0:
-            no_fresh_grass(finder)
-
+        # TODO: delete the used crossroads from the first execute_path
         newDir: str = finder.pathOptions["#"][0]
         if isTurn(finder.dir, newDir):
             finder.timeSpent += 1
-        finder.dir = newDir
 
-        finder.position = next_pos(finder.position, finder.dir)
-        finder.grid[finder.position[1]][finder.position[0]] = "="
+        finder.grid = crossroad.grid
+        finder.position = position
+        finder.grid[crossroad.position[1]][crossroad.position[0]] = "="
         finder.timeSpent = printOutput(finder.timeSpent, finder.grid)
+        timeSpent, permCrossroads = finder.execute_path()
 
     times.append(timeSpent)

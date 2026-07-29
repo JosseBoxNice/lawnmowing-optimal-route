@@ -167,7 +167,7 @@ def printOutput(timeSpent: int, grid: list[list[str]]) -> int:
     for line in grid:
         print(line)
     print("------------------------------------------------------")
-    time.sleep(0.5)
+    time.sleep(0.2)
     return timeSpent
 
 
