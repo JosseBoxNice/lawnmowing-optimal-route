@@ -28,8 +28,6 @@ finder = PathFinder(grid)
 times: list[int] = []
 
 timeSpent, permCrossroads = finder.execute_path()
-print(grid)
-print(permCrossroads[-1].position)
 
 # Backtrack through until all paths
 while len(permCrossroads) > 0:
@@ -51,6 +49,7 @@ while len(permCrossroads) > 0:
         if isTurn(finder.dir, newDir):
             finder.timeSpent += 1
 
+        finder.timeSpent = timeSpent
         finder.grid = crossroad.grid
         finder.position = position
         finder.grid[crossroad.position[1]][crossroad.position[0]] = "="

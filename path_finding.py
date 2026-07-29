@@ -22,14 +22,11 @@ class PathFinder:
             # check if isCrossroads
             if len(self.pathOptions["#"]) > 1:
                 self.tempCrossroads.append(self.position)
-                print(self.grid)
                 self.permCrossroads.append(
                     Crossroad(
                         self.position, self.pathOptions, self.timeSpent, self.grid
                     )
                 )
-
-            # print(pathOptions, isCrossroad)
 
             if len(self.pathOptions["#"]) == 0:
                 no_fresh_grass(self)
@@ -38,7 +35,6 @@ class PathFinder:
             if isTurn(self.dir, newDir):
                 self.timeSpent += 1
             self.dir = newDir
-            # print(dir)
 
             self.position = next_pos(self.position, self.dir)
             self.grid[self.position[1]][self.position[0]] = "="
@@ -141,8 +137,6 @@ def pathToCrossroad(
     optionPositions: list[tuple[tuple[int, int], str]] = []
     for option in self.pathOptions["="]:
         optionPositions.append((next_pos(self.position, option), option))
-
-    # print(optionPositions)
 
     # Get distances to destiantion of possible directions
     distances: list[float] = []
