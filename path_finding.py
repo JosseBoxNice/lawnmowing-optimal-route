@@ -28,6 +28,7 @@ class PathFinder:
                     )
                 )
 
+            self.grid[self.position[1]][self.position[0]] = "="
             if len(self.pathOptions["#"]) == 0:
                 no_fresh_grass(self)
 
@@ -37,19 +38,22 @@ class PathFinder:
             self.dir = newDir
 
             self.position = next_pos(self.position, self.dir)
-            self.grid[self.position[1]][self.position[0]] = "="
+            self.grid[self.position[1]][self.position[0]] = "L"
             self.timeSpent = printOutput(self.timeSpent, self.grid)
         return self.timeSpent, self.permCrossroads
 
 
 def no_fresh_grass(self: PathFinder):
     while self.position != self.tempCrossroads[len(self.tempCrossroads) - 1]:
+        self.grid[self.position[1]][self.position[0]] = "="
         self.position, newDir = pathToCrossroad(self, self.tempCrossroads[-1])
+        self.grid[self.position[1]][self.position[0]] = "L"
         if isTurn(self.dir, newDir):
             self.timeSpent += 1
         self.dir = newDir
         self.pathOptions = scan_around(self.dir, self.position, self.grid)
         self.timeSpent = printOutput(self.timeSpent, self.grid)
+    self.grid[self.position[1]][self.position[0]] = "="
     _ = self.tempCrossroads.pop()
 
 

@@ -52,7 +52,6 @@ while len(permCrossroads) > 0:
         finder.timeSpent = timeSpent
         finder.grid = crossroad.grid
         finder.position = position
-        finder.grid[crossroad.position[1]][crossroad.position[0]] = "="
         finder.timeSpent = printOutput(finder.timeSpent, finder.grid)
         timeSpent, permCrossroads = finder.execute_path()
 
