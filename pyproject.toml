@@ -1,2 +1,6 @@
 [tool.basedpyright]
 typeCheckingMode = "strict"
+
+[tool.ruff]
+fix = true
+show-fixes = true
