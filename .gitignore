@@ -1,5 +1,2 @@
-<<<<<<< HEAD
 __pycache__/
-=======
-__pycache__/
->>>>>>> origin/master
+pyproject.toml
